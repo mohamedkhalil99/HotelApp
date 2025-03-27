@@ -1,0 +1,51 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Hotel {
+  id: Float!
+  name: String!
+  city: String!
+  description: String
+  availableRooms: Float!
+  rating: Float!
+  hasWifi: String!
+  hasParking: String!
+  priceRange: Float
+}
+
+type Query {
+  allHotels: [Hotel!]!
+  getHotelsByCity(city: String!): [Hotel!]!
+  getHotel(id: Float!): Hotel!
+}
+
+type Mutation {
+  addHotel(hotelInput: AddHotelDto!): Hotel!
+  updateHotel(id: Float!, updateHotelInput: UpdateHotelDto!): Hotel!
+  deleteHotel(id: Float!): String!
+}
+
+input AddHotelDto {
+  id: Float!
+  name: String!
+  city: String!
+  description: String
+  availableRooms: Float!
+  rating: Float!
+  hasWifi: String!
+  hasParking: String!
+  priceRange: Float
+}
+
+input UpdateHotelDto {
+  id: Float
+  name: String
+  city: String
+  description: String
+  availableRooms: Float
+  rating: Float
+  hasWifi: String
+  hasParking: String
+  priceRange: Float
+}
