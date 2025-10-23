@@ -5,7 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Hotel} from './hotel.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Hotel])], // Register entities
+  imports: [TypeOrmModule.forFeature([Hotel])],
   providers: [HotelService, HotelResolver],
-  exports: [HotelService],})
+  exports: [HotelService],
+})
 export class HotelModule {}

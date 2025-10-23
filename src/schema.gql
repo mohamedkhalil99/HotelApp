@@ -3,49 +3,135 @@
 # ------------------------------------------------------
 
 type Hotel {
-  id: Float!
+  id: Int!
   name: String!
   city: String!
   description: String
-  availableRooms: Float!
+  availableRooms: Int!
   rating: Float!
-  hasWifi: String!
-  hasParking: String!
+  hasWifi: Boolean!
+  hasParking: Boolean!
   priceRange: Float
+}
+
+type User {
+  id: Float!
+  username: String!
+  email: String!
+  role: UserRole!
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+type AuthResponse {
+  message: String
+  user: User!
+  accessToken: String!
+  refreshToken: String!
+}
+
+type RefreshTokenResponse {
+  accessToken: String!
+  refreshToken: String!
+}
+
+type MessageResponse {
+  message: String!
+  code: String
 }
 
 type Query {
   allHotels: [Hotel!]!
   getHotelsByCity(city: String!): [Hotel!]!
-  getHotel(id: Float!): Hotel!
+  getHotel(id: Int!): Hotel!
+  getSelf: User!
+  allUsers: [User!]!
+  getUserById(id: Float!): User!
 }
 
 type Mutation {
   addHotel(hotelInput: AddHotelDto!): Hotel!
-  updateHotel(id: Float!, updateHotelInput: UpdateHotelDto!): Hotel!
-  deleteHotel(id: Float!): String!
+  updateHotel(id: Int!, updateHotelInput: UpdateHotelDto!): Hotel!
+  deleteHotel(id: Int!): String!
+  signUp(signUpInput: SignUpDto!): AuthResponse!
+  login(loginInput: LoginDto!): AuthResponse!
+  forgotPassword(forgotPasswordInput: ForgotPasswordDto!): MessageResponse!
+  verifyResetPasswordCode(verifyResetCodeInput: VerifyResetPasswordCodeDto!): MessageResponse!
+  resetPassword(resetPasswordInput: NewPasswordDto!): MessageResponse!
+  refreshToken(refreshTokenInput: RefreshTokenDto!): RefreshTokenResponse!
+  updateSelf(updateUserInput: UpdateUserDto!): User!
+  deleteSelf: String!
+  addUser(createUserInput: CreateUserDto!): User!
+  updateUserAsAdmin(id: Float!, updateUserInput: UpdateUserDto!): User!
+  deleteUserAsAdmin(id: Float!): String!
 }
 
 input AddHotelDto {
-  id: Float!
   name: String!
   city: String!
   description: String
-  availableRooms: Float!
+  availableRooms: Int!
   rating: Float!
-  hasWifi: String!
-  hasParking: String!
+  hasWifi: Boolean!
+  hasParking: Boolean!
   priceRange: Float
 }
 
 input UpdateHotelDto {
-  id: Float
   name: String
   city: String
   description: String
-  availableRooms: Float
+  availableRooms: Int
   rating: Float
-  hasWifi: String
-  hasParking: String
+  hasWifi: Boolean
+  hasParking: Boolean
   priceRange: Float
+}
+
+input SignUpDto {
+  username: String!
+  email: String!
+  password: String!
+}
+
+input LoginDto {
+  email: String!
+  password: String!
+}
+
+input ForgotPasswordDto {
+  email: String!
+}
+
+input VerifyResetPasswordCodeDto {
+  email: String!
+  code: String!
+}
+
+input NewPasswordDto {
+  email: String!
+  newPassword: String!
+}
+
+input RefreshTokenDto {
+  refreshToken: String!
+}
+
+input UpdateUserDto {
+  username: String
+  email: String
+  password: String
+  role: UserRole
+  verificationCode: String
+}
+
+input CreateUserDto {
+  username: String!
+  email: String!
+  password: String!
+  role: UserRole
+  verificationCode: String
 }

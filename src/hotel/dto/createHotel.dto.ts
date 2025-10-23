@@ -1,42 +1,42 @@
-import { Field, InputType } from "@nestjs/graphql";
-import { IsNumber, IsString } from "class-validator";
+import { Field, InputType, Float, Int } from '@nestjs/graphql';
+import { IsNumber, IsOptional, IsString, IsBoolean, Min, Max } from 'class-validator';
 
 @InputType()
-export class AddHotelDto
-{
-  @IsNumber()
-  @Field()
-  id:number
-
+export class AddHotelDto {
   @IsString()
   @Field()
   name: string;
 
   @IsString()
   @Field()
-  city:string;
+  city: string;
 
+  @IsOptional()
   @IsString()
-  @Field({nullable:true})
-  description: string;
+  @Field({ nullable: true })
+  description?: string;
 
   @IsNumber()
-  @Field()
+  @Min(0)
+  @Field(() => Int)
   availableRooms: number;
-  
-  @IsNumber()
-  @Field()
-  rating:number;
-
-  @IsString()
-  @Field()
-  hasWifi:string;
-
-  @IsString()
-  @Field()
-  hasParking:string;
 
   @IsNumber()
-  @Field({nullable:true})
-  priceRange: number;
+  @Min(0)
+  @Max(5)
+  @Field(() => Float)
+  rating: number;
+
+  @IsBoolean()
+  @Field()
+  hasWifi: boolean;
+
+  @IsBoolean()
+  @Field()
+  hasParking: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  @Field(() => Float, { nullable: true })
+  priceRange?: number;
 }

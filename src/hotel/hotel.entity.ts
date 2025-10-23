@@ -1,4 +1,4 @@
-import { Field,ObjectType } from '@nestjs/graphql';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType() // GraphQL ObjectType decorator
@@ -6,8 +6,8 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 export class Hotel 
 {
   @PrimaryGeneratedColumn()
-  @Field()
-  id:number
+  @Field(() => Int)
+  id: number;
 
   @Column()
   @Field()
@@ -15,58 +15,29 @@ export class Hotel
 
   @Column()
   @Field()
-  city:string;
+  city: string;
 
-  @Column()
-  @Field({nullable:true})
-  description: string;
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  description?: string;
 
-  @Column()
-  @Field()
+  @Column({ type: 'int' })
+  @Field(() => Int)
   availableRooms: number;
-  
-  @Column()
-  @Field()
-  rating:number;
 
-  @Column()
-  @Field()
-  hasWifi:string;
+  @Column({ type: 'float', default: 0 })
+  @Field(() => Float)
+  rating: number;
 
-  @Column()
+  @Column({ default: false })
   @Field()
-  hasParking:string;
+  hasWifi: boolean;
 
-  @Column()
-  @Field({nullable:true})
-  priceRange: number;
+  @Column({ default: false })
+  @Field()
+  hasParking: boolean;
+
+  @Column({ type: 'float', nullable: true })
+  @Field(() => Float, { nullable: true })
+  priceRange?: number;
 }
-// {
-//   @Field(() => Int) // GraphQL field for ID
-//   @PrimaryGeneratedColumn()
-//   id: number;
-
-//   @Field() 
-//   @Column()
-//   name: string;
-
-//   @Field(() => Int, { nullable: true })
-//   @Column({ nullable: true })
-//   totalRooms: number;
-
-//   @Field(() => Int) 
-//   @Column()
-//   availableRooms: number;
-
-//   @Field({ nullable: true }) 
-//   @Column({ nullable: true })
-//   description: string;
-
-//   @Field(() => Int, { nullable: true })
-//   @Column({ nullable: true })
-//   priceRange: number;
-
-//   @Field({ nullable: true })
-//   @Column({ nullable: true })
-//   type: string;
-// }
