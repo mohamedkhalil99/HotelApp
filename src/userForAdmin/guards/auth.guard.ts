@@ -22,35 +22,31 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    // لو مفيش role محدد للسياق، يبقى نسمح عادي
+    // If no roles are required, allow access
     if (!requiredRoles) return true;
 
-    // جلب GraphQL context
+    // GraphQL context extraction
     const ctx = GqlExecutionContext.create(context);
     const req = ctx.getContext().req;
+
+    // Retrieve token from Authorization header or cookies
     const authHeader = req.headers.authorization;
+    let token: string | undefined;
 
-    if (!authHeader) {
-      throw new UnauthorizedException('No Authorization header found');
-    }
+    if (authHeader?.startsWith('Bearer ')) {token = authHeader.split(' ')[1];} 
+    // Get token from cookies if not in header
+    else if (req.cookies?.refreshToken) {token = req.cookies.refreshToken;}
 
-    const token = authHeader.split(' ')[1];
-    if (!token) {
-      throw new UnauthorizedException('No token provided');
-    }
+    if (!token) {throw new UnauthorizedException('No Authorization header or cookie found');}
 
     try {
-      const payload = this.jwtService.verify<JwtPayload>(token, {
-        secret: process.env.JWT_KEY,
-      });
+      const payload = this.jwtService.verify<JwtPayload>(token, {secret: process.env.JWT_KEY,});
 
       req.user = payload;
 
-      // لو اليوزر عنده أحد الأدوار المطلوبة، نسمحله
+      // Check if user role is in required roles
       return requiredRoles.some((role) => payload.role === role);
     } 
-    catch {
-      throw new UnauthorizedException('Invalid or expired token');  
-    } 
+    catch {throw new UnauthorizedException('Invalid or expired token');}
   }
 }

@@ -30,12 +30,17 @@ type AuthResponse {
   message: String
   user: User!
   accessToken: String!
-  refreshToken: String!
+  refreshToken: String
 }
 
 type RefreshTokenResponse {
   accessToken: String!
   refreshToken: String!
+}
+
+type LogoutResponse {
+  success: Boolean!
+  message: String
 }
 
 type MessageResponse {
@@ -61,7 +66,8 @@ type Mutation {
   forgotPassword(forgotPasswordInput: ForgotPasswordDto!): MessageResponse!
   verifyResetPasswordCode(verifyResetCodeInput: VerifyResetPasswordCodeDto!): MessageResponse!
   resetPassword(resetPasswordInput: NewPasswordDto!): MessageResponse!
-  refreshToken(refreshTokenInput: RefreshTokenDto!): RefreshTokenResponse!
+  refreshToken: RefreshTokenResponse!
+  logout: LogoutResponse!
   updateSelf(updateUserInput: UpdateUserDto!): User!
   deleteSelf: String!
   addUser(createUserInput: CreateUserDto!): User!
@@ -114,10 +120,6 @@ input VerifyResetPasswordCodeDto {
 input NewPasswordDto {
   email: String!
   newPassword: String!
-}
-
-input RefreshTokenDto {
-  refreshToken: String!
 }
 
 input UpdateUserDto {

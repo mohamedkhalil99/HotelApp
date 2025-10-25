@@ -1,8 +1,8 @@
-import { Resolver, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Context } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
-import { ForgotPasswordDto, NewPasswordDto, RefreshTokenDto, LoginDto, SignUpDto, VerifyResetPasswordCodeDto } from './dto/auth.dto';
+import { ForgotPasswordDto, NewPasswordDto, LoginDto, SignUpDto, VerifyResetPasswordCodeDto } from './dto/auth.dto';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
-import { AuthResponse, RefreshTokenResponse, MessageResponse } from './dto/auth-response';
+import { AuthResponse, RefreshTokenResponse, MessageResponse, LogoutResponse } from './dto/auth-response';
 
 @Resolver()
 export class AuthResolver {
@@ -22,8 +22,24 @@ export class AuthResolver {
   // Access: Public
   @Mutation(() => AuthResponse)
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-  login(@Args('loginInput') loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(@Args('loginInput') loginDto: LoginDto, @Context() context) {
+    const tokens = await this.authService.login(loginDto);
+
+    context.res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: false, // true while Production
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    // Return user and access token
+    return {
+      message: tokens.message,
+      user: tokens.user,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+    };
   }
 
   // Desc: User can reset password
@@ -58,7 +74,28 @@ export class AuthResolver {
   // Access: Public
   @Mutation(() => RefreshTokenResponse)
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-  refreshToken(@Args('refreshTokenInput') refreshTokenDto: RefreshTokenDto) {
-    return this.authService.refreshToken(refreshTokenDto);
+  async refreshToken(@Context() context): Promise<RefreshTokenResponse> {
+    const refreshToken = context.req.cookies?.refreshToken;
+    const newTokens = await this.authService.refreshToken(refreshToken);
+
+    // Set new refresh token in httpOnly cookie
+    context.res.cookie('refreshToken', newTokens.refreshToken, {
+      httpOnly: true,
+      secure: false,// true while Production
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000,// 7 days
+    });
+
+    return newTokens;
+  }
+  
+  // Desc: User can logout
+  // Mutation: logout
+  // Access: Public
+  @Mutation(() => LogoutResponse)
+  async logout(@Context() context): Promise<LogoutResponse> {
+    context.res.clearCookie('refreshToken', { path: '/' });
+    return { success: true, message: 'Logged out successfully' };
   }
 }

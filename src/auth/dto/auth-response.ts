@@ -12,7 +12,7 @@ export class AuthResponse {
   @Field()
   accessToken?: string;
 
-  @Field()
+  @Field({ nullable: true })
   refreshToken?: string;
 }
 
@@ -40,5 +40,5 @@ export class MessageResponse {
   message: string;
 
   @Field({ nullable: true })
-  code?: string; // لأغراض verification
+  code?: string;
 }
